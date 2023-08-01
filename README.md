@@ -1,46 +1,33 @@
-# Getting Started with Create React App
+# Prototype for a DndKit implementation with a Reusable Blocks Bank
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Libraries
+- Typescript
+- DndKit (@dnd-kit/core, @dnd-kit/sortable): https://docs.dndkit.com/
+- Styled Components
 
-## Available Scripts
+## Architecture 
 
-In the project directory, you can run:
+### Components
 
-### `npm start`
+`App.tsx`
+- Contains state for blocks bank (draggable blocks)
+- Contains state for preview blocks (blocks live in `AppPreview.tsx`
+- Contains all `DndConext` functionality
+  - onDragOver: handles drag overlay, sets preview blocks to pull in new draggable (`setPreviewBlocks(arrayMove(previewBlocks, active_index, over_index) 
+  - handleDragEnd: drag end logic (checks for droppable placement, logic for replacing a draggable block that has been pulled into blocksPreview
+  - onDragStart: sets active draggable state and active draggable origin state
+  - onDragCancel: resets active draggable state and active draggable origin state to null
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+`AppPreview.tsx`
+- Contains `SortableContext` (https://docs.dndkit.com/presets/sortable/sortable-context)
+  - items props iterates through the blocks that have been added to the app preview
+- Inside of `SortableContext` component, a ref from the `useDroppable` hook is applied to the div that encompasses the block items that are iterated through 
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+`DraggableItem.tsx`
+- Contains `useDraggable` hook from dnd-kit/core
+- Receives id from available draggables that are iterated through in App.jsx (aka: bank blocks)
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+`SortableItem.tsx`
+- Contains `useSortableHook` (https://docs.dndkit.com/presets/sortable/usesortable)
+  - In addition to the attributes, listeners,transform and setNodeRef arguments (also provided by `useDraggable` hook) a transition argument is provided as well
+  - transition: disables transform transitions while not dragging, but ensures that items transition back to their final positions when the drag operation is ended or cancelled
